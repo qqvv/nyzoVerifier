@@ -44,6 +44,8 @@ public enum MessageType {
     BootstrapResponseV2_36(36),
     BlockWithVotesRequest37(37),
     BlockWithVotesResponse38(38),
+    NewVerifierVotemapRequest198(198),
+    NewVerifierVotemapResponse199(199),
 
     // test messages
     Ping200(200),

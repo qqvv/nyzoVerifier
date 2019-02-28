@@ -119,4 +119,14 @@ public class NewVerifierVoteManager {
 
         return localVote;
     }
+
+    public static synchronized Map<ByteBuffer, ByteBuffer> getVoteMap() {
+
+        return voteMap;
+    }
+
+    public static int getByteSizeStatic() {
+
+        return FieldByteSize.identifier + FieldByteSize.identifier;
+    }
 }

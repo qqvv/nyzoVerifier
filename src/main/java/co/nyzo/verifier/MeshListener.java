@@ -107,8 +107,7 @@ public class MeshListener {
             ByteBuffer ipBuffer = ByteBuffer.wrap(ipAddress);
             AtomicInteger connectionsForIp = connectionsPerIp.merge(ipBuffer, new AtomicInteger(0), mergeFunction);
 
-            if (connectionsForIp.incrementAndGet() > maximumConcurrentConnectionsForIp &&
-                    !Message.ipIsWhitelisted(ipAddress)) {
+            if (connectionsForIp.incrementAndGet() > maximumConcurrentConnectionsForIp) {
 
                 System.out.println("blacklisting IP " + IpUtil.addressAsString(ipAddress) +
                         " due to too many concurrent connections");
@@ -287,6 +286,11 @@ public class MeshListener {
                     long height = ((BlockWithVotesRequest) message.getContent()).getHeight();
                     response = new Message(MessageType.BlockWithVotesResponse38, new BlockWithVotesResponse(height));
 
+                } else if (messageType == MessageType.NewVerifierVotemapRequest198) { //
+
+                    response = new Message(MessageType.NewVerifierVotemapResponse199,
+                            new NewVerifierVotemapResponse(NewVerifierVoteManager.getVoteMap()));
+                            
                 } else if (messageType == MessageType.Ping200) {
 
                     response = new Message(MessageType.PingResponse201, new PingResponse("hello, " +
