@@ -124,9 +124,4 @@ public class NewVerifierVoteManager {
 
         return voteMap;
     }
-
-    public static int getByteSizeStatic() {
-
-        return FieldByteSize.identifier + FieldByteSize.identifier;
-    }
 }

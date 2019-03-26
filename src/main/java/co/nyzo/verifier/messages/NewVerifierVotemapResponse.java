@@ -1,28 +1,28 @@
 package co.nyzo.verifier.messages;
 
+import co.nyzo.verifier.FieldByteSize;
 import co.nyzo.verifier.MessageObject;
 import co.nyzo.verifier.NewVerifierVoteManager;
 
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class NewVerifierVotemapResponse implements MessageObject {
 
-    private Map<ByteBuffer, ByteBuffer> voteMap;
+    private Map<ByteBuffer, ByteBuffer> voteMap = new HashMap<>();
 
-    public NewVerifierVotemapResponse(List<Node> voteMap) {
+    public NewVerifierVotemapResponse(Map<ByteBuffer, ByteBuffer> voteMap) {
         this.voteMap = voteMap;
     }
 
-    public List<Node> getVoteMap() {
+    public Map<ByteBuffer, ByteBuffer> getVoteMap() {
         return voteMap;
     }
 
     @Override
     public int getByteSize() {
 
-        return 4 + voteMap.size() * (voteMap.getByteSizeStatic());
+        return 4 + voteMap.size() * (FieldByteSize.identifier + FieldByteSize.identifier);
     }
 
     @Override
@@ -31,7 +31,7 @@ public class NewVerifierVotemapResponse implements MessageObject {
         byte[] result = new byte[getByteSize()];
         ByteBuffer buffer = ByteBuffer.wrap(result);
         buffer.putInt(voteMap.size());
-        for (Node votingVerifier: voteMap) {
+        for (ByteBuffer votingVerifier : voteMap.keySet()) {
             buffer.put(votingVerifier.array());
             buffer.put(voteMap.get(votingVerifier).array());
         }
@@ -39,16 +39,20 @@ public class NewVerifierVotemapResponse implements MessageObject {
         return result;
     }
 
-    public static MeshResponse fromByteBuffer(ByteBuffer buffer) {
+    public static NewVerifierVotemapResponse fromByteBuffer(ByteBuffer buffer) {
 
-        MeshResponse result = null;
+        NewVerifierVotemapResponse result = null;
 
         try {
             Map<ByteBuffer, ByteBuffer> voteMap = new HashMap<>();
 
             int numberOfVotes = buffer.getInt();
             for (int i = 0; i < numberOfVotes; i++) {
-                voteMap.put(votingIdentifierBuffer, ByteBuffer.wrap(vote.getIdentifier()));
+              byte[] votingVerifier = new byte[FieldByteSize.identifier];
+              buffer.get(votingVerifier);
+              byte[] vote = new byte[FieldByteSize.identifier];
+              buffer.get(vote);
+              voteMap.put(ByteBuffer.wrap(votingVerifier), ByteBuffer.wrap(vote));
             }
 
             result = new NewVerifierVotemapResponse(voteMap);
@@ -61,17 +65,7 @@ public class NewVerifierVotemapResponse implements MessageObject {
 
     @Override
     public String toString() {
-        StringBuilder result = new StringBuilder("[NewVerifierVotemapResponse(" + voteMap.size() + "): {");
-        String separator = "";
-        for (int i = 0; i < mesh.size() && i < 5; i++) {
-            result.append(separator).append(mesh.get(i).toString());
-            separator = ",";
-        }
-        if (mesh.size() > 5) {
-            result.append("...");
-        }
-        result.append("}]");
-
+        StringBuilder result = new StringBuilder("[NewVerifierVotemapResponse(" + voteMap.size() + ")]");
         return result.toString();
     }
 }
